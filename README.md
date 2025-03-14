@@ -7,4 +7,4 @@ This is my first repository dedicated to learning and exploring Golang. I'll be 
 - Build simple and efficient Go applications  
 - Explore Go best practices and patterns  
 
-Feedback and collaboration are welcome!
+Feedback is welcome!
