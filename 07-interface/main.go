@@ -7,57 +7,80 @@ import (
 	"strings"
 
 	"example.com/note-app/note"
+	"example.com/note-app/todo"
 )
 
-type sever interface {
+type saver interface {
 	Save() error
 }
 
 func main() {
 	title, content := getNoteData()
+	todoText := getUserInput("Todo text: ")
 
-	note, err := note.New(title, content)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	note.Display()
+	todo, err := todo.New(todoText)
 
-	err = note.Save()
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	fmt.Println("Note has been saved successfully !")
+	userNote, err := note.New(title, content)
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	todo.Display()
+	err = saveData(todo)
+
+	if err != nil {
+		fmt.Println("Saving the todo failed.")
+		return
+	}
+
+	fmt.Println("Saving the todo succeeded!")
+
+	userNote.Display()
+	err = saveData(userNote)
+	if err != nil {
+		fmt.Println("Saving the note failed.")
+		return
+	}
+	fmt.Println("Saving the note succeeded!")
+}
+
+func saveData(data saver) error {
+	err := data.Save()
+
+	if err != nil {
+		fmt.Println("Saving the note failed.")
+		return err
+	}
+	return nil
 }
 
 func getNoteData() (string, string) {
-	title := getUserInput("Enter note title: ")
-	content := getUserInput("Enter note content: ")
+	title := getUserInput("Note title:")
+	content := getUserInput("Note content:")
 
 	return title, content
 }
 
 func getUserInput(prompt string) string {
-	fmt.Print(prompt)
-	var text string
-	// fmt.Scanln(&note)
-	/**
-	* NewReader is a constructor function
-	* os.Stdin  is the source from which we get input its meaning is standard input which mean input from terminal
-	*
-	 */
+	fmt.Printf("%v ", prompt)
 
 	reader := bufio.NewReader(os.Stdin)
 
-	//use single code here because its special value type in GO called Rune
 	text, err := reader.ReadString('\n')
 
 	if err != nil {
-		fmt.Println(err)
+		return ""
 	}
+
 	text = strings.TrimSuffix(text, "\n")
 	text = strings.TrimSuffix(text, "\r")
+
 	return text
 }
