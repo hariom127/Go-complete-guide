@@ -2,33 +2,19 @@ package main
 
 import "fmt"
 
-type transformFn func(int) int
-
 func main() {
-	numbers := []int{1, 3, 5, 6}
 
-	//**** Function is a fist class value in go
-	// so we can pass a function in another function as a value *****
+	factorial := getFactorial(3)
 
-	doubleNum := transformNumbers(&numbers, double)
-	tripleNum := transformNumbers(&numbers, triple)
+	fmt.Println(factorial)
 
-	fmt.Println(doubleNum)
-	fmt.Println(tripleNum)
 }
 
-func transformNumbers(numbers *[]int, transform transformFn) []int {
-	dNumbers := []int{}
-	for _, value := range *numbers {
-		dNumbers = append(dNumbers, transform(value))
+func getFactorial(num int) int {
+
+	if num == 0 {
+		return 1
 	}
-	return dNumbers
-}
+	return num * getFactorial(num-1)
 
-func double(num int) int {
-	return num * 2
-}
-
-func triple(num int) int {
-	return num * 3
 }
