@@ -3,11 +3,13 @@ package main
 import (
 	"net/http"
 
+	"example.com/apis/db"
 	"example.com/apis/models"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	db.InitDB()
 	server := gin.Default()
 
 	server.GET("/events", getEvents)
@@ -17,23 +19,31 @@ func main() {
 }
 
 func getEvents(context *gin.Context) {
-	var events = models.GetAllEvents()
+	var events, err = models.GetAllEvents()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Server error", "events": events})
+	}
 	context.JSON(http.StatusOK, gin.H{"message": "Hello !🥳", "events": events})
 }
 
 func createEvents(context *gin.Context) {
 
 	var event models.Event
-
 	err := context.ShouldBindBodyWithJSON(&event)
 
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"message": "Bad request body"})
 		return
 	}
-	event.ID = 1
+	// event.ID = 1
 	event.UserId = 1
 
+	err = event.Save()
+
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"message": "Bad request body", "err": err})
+		return
+	}
 	context.JSON(http.StatusCreated, gin.H{"message": "Event has been created !", "event": event})
 
 }
